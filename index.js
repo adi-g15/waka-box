@@ -2,6 +2,7 @@ require("dotenv").config();
 const { WakaTimeClient, RANGE } = require("wakatime-client");
 const Octokit = require("@octokit/rest");
 const { program } = require("commander");
+const { readConfigFile } = require("./lib/config");
 
 const {
   GIST_ID: gistId,
@@ -13,6 +14,7 @@ const wakatime = new WakaTimeClient(wakatimeApiKey);
 
 const octokit = new Octokit({ auth: `token ${githubToken}` });
 
+const argv = process.argv.slice(0, 2).concat(readConfigFile("config")).concat(process.argv.slice(2));
 program
   .version(require("./package.json").version)
   .option(
@@ -22,7 +24,7 @@ program
   )
   .option("--include-percent", "Include a percentage after each bar.", false)
   .option("--dry", "Print to stdout instead of uploading a gist.", false)
-  .parse(process.argv);
+  .parse(argv);
 
 async function main() {
   const stats = await wakatime.getMyStats({ range: RANGE.LAST_7_DAYS });
