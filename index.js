@@ -101,7 +101,11 @@ function generateBarChart(percent, size) {
 }
 
 function formatDuration(h, m) {
-  return `${String(h).padStart(2)}h ${String(m).padStart(2)}m`;
+  if (h > 0) {
+    return `${String(h).padStart(2)}h ${String(m).padStart(2)}m`;
+  } else {
+    return `${String(m).padStart(6)}m`;
+  }
 }
 
 (async () => {
