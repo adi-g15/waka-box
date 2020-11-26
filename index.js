@@ -51,12 +51,12 @@ async function updateGist(stats) {
       timeText = data.text.padEnd(14);
     }
 
-    const line = [name.padEnd(11), timeText, generateBarChart(percent, 21)];
-
-    if (program.includePercent) {
-      line.push(String(percent.toFixed(1)).padStart(5) + "%");
-    }
-
+    const line = [
+      name.padEnd(11),
+      timeText,
+      generateBarChart(percent, 21),
+      ... program.includePercent ? [String(percent.toFixed(1)).padStart(5) + "%"] : [],
+    ];
     lines.push(line.join(" "));
   }
 
