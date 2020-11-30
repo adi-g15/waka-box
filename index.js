@@ -3,6 +3,7 @@ const { WakaTimeClient, RANGE } = require("wakatime-client");
 const Octokit = require("@octokit/rest");
 const { program } = require("commander");
 const { readConfigFile } = require("./lib/config");
+const { readMappingFile } = require("./lib/mapping");
 
 const {
   GIST_ID: gistId,
@@ -39,10 +40,13 @@ async function updateGist(stats) {
     console.error(`Unable to get gist\n${error}`);
   }
 
+  const mapping = readMappingFile("mapping");
+
   const lines = [];
   for (let i = 0; i < Math.min(stats.data.languages.length, 5); i++) {
     const data = stats.data.languages[i];
     const { name, percent } = data;
+    const nameMapped = (name in mapping) ? mapping[name] : name;
 
     let timeText;
     if (program.format === "short") {
@@ -52,7 +56,7 @@ async function updateGist(stats) {
     }
 
     const line = [
-      name.padEnd(11),
+      nameMapped.padEnd(11),
       timeText,
       generateBarChart(percent, 21),
       ... program.includePercent ? [String(percent.toFixed(1)).padStart(5) + "%"] : [],
