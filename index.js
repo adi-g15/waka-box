@@ -30,6 +30,7 @@ program
     "Specify which set of block element characters to use. SCHEME can be 0 or 1.",
     0
   )
+  .option("--relative", "Scale bars relative to the most used language instead of the sum of all languages used.", false)
   .parse(argv);
 
 async function main() {
@@ -52,7 +53,11 @@ async function updateGist(stats) {
   for (let i = 0; i < Math.min(stats.data.languages.length, 5); i++) {
     const data = stats.data.languages[i];
     const { name, percent } = data;
+
     const nameMapped = (name in mapping) ? mapping[name] : name;
+    const percentRel = program.relative
+      ? 100 * percent / stats.data.languages[0].percent
+      : percent;
 
     let timeText;
     if (program.format === "short") {
@@ -64,7 +69,7 @@ async function updateGist(stats) {
     const line = [
       nameMapped.padEnd(11),
       timeText,
-      generateBarChart(percent, 21, syms),
+      generateBarChart(percentRel, 21, syms),
       ... program.includePercent ? [String(percent.toFixed(1)).padStart(5) + "%"] : [],
     ];
     lines.push(line.join(" "));
