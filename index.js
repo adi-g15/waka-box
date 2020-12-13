@@ -25,6 +25,11 @@ program
   )
   .option("--include-percent", "Include a percentage after each bar.", false)
   .option("--dry", "Print to stdout instead of uploading a gist.", false)
+  .option(
+    "--scheme [SCHEME]",
+    "Specify which set of block element characters to use. SCHEME can be 0 or 1.",
+    0
+  )
   .parse(argv);
 
 async function main() {
@@ -41,6 +46,7 @@ async function updateGist(stats) {
   }
 
   const mapping = readMappingFile("mapping");
+  const syms = [" ▏▎▍▌▋▊▉█", "░▏▎▍▌▋▊▉█"][program.scheme];
 
   const lines = [];
   for (let i = 0; i < Math.min(stats.data.languages.length, 5); i++) {
@@ -58,7 +64,7 @@ async function updateGist(stats) {
     const line = [
       nameMapped.padEnd(11),
       timeText,
-      generateBarChart(percent, 21),
+      generateBarChart(percent, 21, syms),
       ... program.includePercent ? [String(percent.toFixed(1)).padStart(5) + "%"] : [],
     ];
     lines.push(line.join(" "));
@@ -89,9 +95,7 @@ async function updateGist(stats) {
   }
 }
 
-function generateBarChart(percent, size) {
-  const syms = "░▏▎▍▌▋▊▉█";
-
+function generateBarChart(percent, size, syms) {
   const frac = Math.floor((size * 8 * percent) / 100);
   const barsFull = Math.floor(frac / 8);
   if (barsFull >= size) {
